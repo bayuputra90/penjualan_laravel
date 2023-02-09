@@ -18,7 +18,10 @@ use App\Http\Controllers\TransactionController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
+});
+Route::get('register', function () {
+    return view('auth.register');
 });
 
 Route::get('/test', function () {
