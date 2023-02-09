@@ -106,7 +106,9 @@ class ProductController extends Controller
                 ->withInput($request->all());
         }
         else {
-            $image = $request->file('image')->store('products', 'public');
+            $image = $request->file('image')->storeAs('products', $request->file('image')->getClientOriginalName(), 'public');
+
+            // return dd($image);
 
             // jika data valid
             // simpan ke database
