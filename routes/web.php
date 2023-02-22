@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Authentication;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
@@ -17,33 +18,44 @@ use App\Http\Controllers\TransactionController;
 |
 */
 
-Route::get('/', function () {
-    return view('auth.login');
+
+Route::middleware('guest')->group(function(){
+    Route::get('/', function () {
+        return view('auth.login');
+    });
+    Route::get('register', function () {
+        return view('auth.register');
+    });
+    Route::post('register', [Authentication::class, 'register'])->name('register');
+    Route::post('login', [Authentication::class, 'login'])->name('login');
 });
-Route::get('register', function () {
-    return view('auth.register');
-});
+
 
 Route::get('/test', function () {
     return view('test', ['message' => 'Hello Laravel']);
 });
 
-Route::get('/admin', [DashboardController::class, 'index']);
+Route::middleware('auth')->group(function(){
+    Route::get('/admin', [DashboardController::class, 'index']);
 
-Route::get('/admin/category/create', [CategoryController::class, 'create']);
+    Route::get('/admin/category/create', [CategoryController::class, 'create']);
+    Route::post('/admin/category', [CategoryController::class, 'store']);
+    Route::get('/admin/category', [CategoryController::class, 'index']);
+    Route::get('/admin/category/{id}', [CategoryController::class, 'show']);
+    Route::get('/admin/category/{id}/edit', [CategoryController::class, 'edit']);
+    Route::put('/admin/category/{id}', [CategoryController::class, 'update']);
+    Route::delete('/admin/category/{id}', [CategoryController::class, 'destroy']);
 
-Route::post('/admin/category', [CategoryController::class, 'store']);
-Route::get('/admin/category', [CategoryController::class, 'index']);
-Route::get('/admin/category/{id}', [CategoryController::class, 'show']);
-Route::get('/admin/category/{id}/edit', [CategoryController::class, 'edit']);
-Route::put('/admin/category/{id}', [CategoryController::class, 'update']);
-Route::delete('/admin/category/{id}', [CategoryController::class, 'destroy']);
+    Route::resource('admin/product', ProductController::class);
 
-Route::resource('admin/product', ProductController::class);
+    Route::get('/admin/trx/create', [TransactionController::class, 'create']);
+    Route::post('/admin/trx/import', [TransactionController::class, 'import']);
+    Route::get('/admin/trx', [TransactionController::class, 'index']);
 
-Route::get('/admin/trx/create', [TransactionController::class, 'create']);
-Route::post('/admin/trx/import', [TransactionController::class, 'import']);
-Route::get('/admin/trx', [TransactionController::class, 'index']);
+    Route::get('logout', [Authentication::class, 'logout'])->name('logout');
+});
+
+
 
 
 
